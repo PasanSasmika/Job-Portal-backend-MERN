@@ -3,8 +3,8 @@ import cors from 'cors';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
-import { AddJob } from './controllers/Jobcontroller.js';
-import { signup } from './controllers/UserController.js';
+import Jobrouter from './routers/JobRouter.js';
+import Userrouter from './routers/UserRouter.js';
 
 
 dotenv.config()
@@ -29,8 +29,8 @@ app.use(bodyParser.json());
 app.use(express.json())
 app.use(cors())
 
-app.use('/api/users', signup);
-app.use('/api/job', AddJob);
+app.use('/api/users', Userrouter);
+app.use('/api/job', Jobrouter);
 
 
 

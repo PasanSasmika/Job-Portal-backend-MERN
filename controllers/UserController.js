@@ -1,39 +1,74 @@
 import bcrypt from 'bcrypt';
 import User from '../Model/Usermodel.js';
 
-// User Signup Controller
-export async function  signup(req, res) {
-  try {
-    const { name, email, password } = req.body;
 
-    // Validate input
-    if (!name || !email || !password) {
-      return res.status(400).json({ message: 'All fields are required.' });
-    }
+export function signup(req,res){
 
-    // Check if user already exists
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({ message: 'Email is already in use.' });
-    }
-
-    // Hash the password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Create new user
-    const newUser = new User({
-      name,
-      email,
-      password: hashedPassword,
-    });
-
-    // Save user to database
-    await newUser.save();
-
-    // Respond with success
-    res.status(201).json({ message: 'User signed up successfully!' });
-  } catch (error) {
-    console.error('Signup error:', error);
-    res.status(500).json({ message: 'Internal server error.' });
+  const newUserData = req.body
+  
+  
+  if(newUserData.type == "admin"){
+  
+      if(req.user==null){
+          res.json({
+              message: "You are not loged in. plese log in as an admin to create admin account"
+          })
+          return
+      }
+  
+      if(req.user.type !="admin"){
+          res.json({
+              message: "You are not an admin. plese log in as an admin"
+          })
+      }
   }
-};
+  
+  
+  
+  newUserData.password = bcrypt.hashSync(newUserData.password, 10)
+  
+  
+  const user  = new User(newUserData)
+  
+  user.save().then(()=>{
+      res.json({
+          message: "User created"
+      })
+  }).catch(()=>{
+      res.json({
+          message: "User not created"
+      })
+  })
+  
+  }
+
+
+export function loginUser(req,res){
+
+  User.find({email:req.body.email}).then(
+    (users)=>{
+      if(users.length == 0){
+        res.json({
+          message:"User not found"
+        })
+
+      }else{
+
+        const user = users[0]
+
+        const isPasswordCorrect =  bcrypt.compareSync(req.body.password, user.password)
+        if(isPasswordCorrect){
+
+          res.json({
+            message:"userFound"
+          })
+
+        }else{
+          res.json({
+            message: "User Password incorrect..!"
+          })
+        }
+      }
+    }
+  )
+}
