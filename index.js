@@ -3,7 +3,8 @@ import cors from 'cors';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
-import router from './routers/UserRouter.js';
+import { AddJob } from './controllers/Jobcontroller.js';
+import { signup } from './controllers/UserController.js';
 
 
 dotenv.config()
@@ -28,7 +29,9 @@ app.use(bodyParser.json());
 app.use(express.json())
 app.use(cors())
 
-app.use('/api/users', router);
+app.use('/api/users', signup);
+app.use('/api/job', AddJob);
+
 
 
 app.listen(port,()=>{

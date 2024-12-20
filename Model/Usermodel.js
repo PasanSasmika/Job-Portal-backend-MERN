@@ -21,6 +21,11 @@ const userSchema = new mongoose.Schema({
      required: true 
 },
 
+type : {
+  type: String,
+  default : "finder"
+},
+
 });
 
 const User = mongoose.model('User', userSchema);
