@@ -1,8 +1,12 @@
 import bcrypt from 'bcrypt';
 import User from '../Model/Usermodel.js';
+import jwt from 'jsonwebtoken';
+import dotenv  from "dotenv";
+
+dotenv.config()
 
 
-export function signup(req,res){
+export function creatuser(req,res){
 
   const newUserData = req.body
   
@@ -59,10 +63,15 @@ export function loginUser(req,res){
         const isPasswordCorrect =  bcrypt.compareSync(req.body.password, user.password)
         if(isPasswordCorrect){
 
-          res.json({
-            message:"userFound"
-          })
-
+          const token = jwt.sign({
+            email: user.email,
+            name: user.name,
+            type: user.type,
+        }, process.env.SECRET)
+            res.json({
+                message: "Logged in successful",
+                token: token
+            })
         }else{
           res.json({
             message: "User Password incorrect..!"

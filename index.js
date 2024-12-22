@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
 import Jobrouter from './routers/JobRouter.js';
 import Userrouter from './routers/UserRouter.js';
+import jwt from 'jsonwebtoken';
 
 
 dotenv.config()
@@ -28,6 +29,23 @@ connection.once("open",()=>{
 app.use(bodyParser.json());
 app.use(express.json())
 app.use(cors())
+
+app.use(
+  (req,res,next)=>{
+
+  const token =  (req.header("Authorization"))?.replace("Bearer ", "")
+  console.log(token)
+
+  if(token != null){
+    jwt.verify(token, process.env.SECRET, (error, decoded)=>{
+      if(!error){
+        req.user = decoded
+      }
+    })
+  }
+  next()
+  }
+)
 
 app.use('/api/users', Userrouter);
 app.use('/api/job', Jobrouter);
